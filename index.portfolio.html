@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anwesh Patro — Bookshelf & Publications</title>
+  
+  <!-- Fonts: Newsreader & Inter Tight -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,500;0,600;1,500;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --paper: #EDEBE6;
+      --sheet: #F4F2ED;
+      --ink: #141414;
+      --muted: #6D6A63;
+      --cobalt: #1F3FB0;
+      --rule: rgba(20, 20, 20, 0.9);
+      --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+      --sheet-ease: cubic-bezier(0.76, 0, 0.18, 1);
+      --H: min(46vh, 31vw);
+      --ws: calc(var(--H) * 142 / 840);
+      --d: calc(var(--H) * 474 / 900);
+      --gap: calc(var(--H) * 0.03);
+    }
+
+    @media (max-width: 767px) {
+      :root {
+        --H: min(60vw, 40svh);
+      }
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: "Inter Tight", system-ui, -apple-system, sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    @media (pointer: fine) {
+      html, body, button, a {
+        cursor: none !important;
+      }
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      background: none;
+      border: none;
+      font: inherit;
+      color: inherit;
+      outline: none;
+    }
+
+    /* Label Typography System */
+    .lbl {
+      font-family: "Inter Tight", sans-serif;
+      font-weight: 600;
+      font-size: 10.5px;
+      line-height: 1;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      display: inline-block;
+      white-space: nowrap;
+    }
+
+    .box {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 21px;
+      padding: 0 8px;
+      border: 1px solid var(--rule);
+      transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
+    }
+
+    /* Fixed Paper Grain Layer - High Performance Pre-rendered 220x220 Tile */
+    .paper-grain {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 40;
+      pointer-events: none;
+      mix-blend-mode: multiply;
+      opacity: 0.55;
+      background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'220'%20height%3D'220'%3E%3Cfilter%20id%3D'n'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'0.85'%20numOctaves%3D'3'%20stitchTiles%3D'stitch'%2F%3E%3CfeColorMatrix%20type%3D'matrix'%20values%3D'0%200%200%200%200.45%20%200%200%200%200%200.42%20%200%200%200%200%200.38%20%200%200%200%200%200.22%200'%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D'220'%20height%3D'220'%20filter%3D'url(%23n)'%2F%3E%3C%2Fsvg%3E");
+      background-repeat: repeat;
+      background-size: 220px 220px;
+      transform: translateZ(0);
+      will-change: transform;
+    }
+
+    /* 1. Top Bar */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 84px;
+      padding: 0 32px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      z-index: 50;
+      pointer-events: auto;
+    }
+
+    .top-bar-left {
+      justify-self: start;
+    }
+
+    .top-bar-center {
+      justify-self: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      color: var(--cobalt);
+    }
+
+    .logo-main {
+      font-family: "Newsreader", Georgia, serif;
+      font-weight: 500;
+      font-style: italic;
+      font-size: 23px;
+      letter-spacing: 0.02em;
+      line-height: 1;
+    }
+
+    .logo-sub {
+      font-family: "Inter Tight", sans-serif;
+      font-weight: 600;
+      font-size: 8.5px;
+      letter-spacing: 0.32em;
+      line-height: 1;
+      padding-left: 0.32em; /* optical balance */
+    }
+
+    .top-bar-right {
+      justify-self: end;
+    }
+
+    /* 2. Decade Navigation Tabs */
+    .decades-nav {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      top: calc(50% - var(--H) / 2 - 86px);
+      z-index: 50;
+      display: inline-flex;
+    }
+
+    .tabs-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .tab-indicator {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 23px;
+      background-color: var(--cobalt);
+      transition: width 0.6s var(--ease), transform 0.6s var(--ease);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .decade-btn {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 23px;
+      padding: 0 11px;
+      border: 1px solid var(--rule);
+      margin-left: -1px;
+      color: var(--ink);
+      transition: color 0.45s var(--ease);
+    }
+
+    .decade-btn:first-child {
+      margin-left: 0;
+    }
+
+    .decade-btn.active {
+      color: #FFFFFF;
+    }
+
+    /* 3. 3D Shelf Stage */
+    .shelf-container {
+      position: fixed;
+      top: calc(50% - var(--H) / 2 - 40px);
+      left: 0;
+      width: 100vw;
+      height: calc(var(--H) + 80px);
+      perspective: 2200px;
+      perspective-origin: 50% 50%;
+      touch-action: pan-y;
+      z-index: 30;
+      cursor: grab;
+    }
+
+    .shelf-container:active {
+      cursor: grabbing;
+    }
+
+    .stage {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 0;
+      height: 0;
+      transform-style: preserve-3d;
+    }
+
+    .tape {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 0;
+      height: 0;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    .face {
+      position: absolute;
+      top: calc(-0.5 * var(--H));
+      height: var(--H);
+      backface-visibility: hidden;
+      border-radius: 2px;
+      overflow: hidden;
+      background-repeat: no-repeat;
+    }
+
+    .face::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-color: #000000;
+      opacity: var(--shade, 0);
+      pointer-events: none;
+    }
+
+    .sp {
+      width: var(--ws);
+      left: calc(-0.5 * var(--ws));
+      transform: translateZ(calc(0.5 * var(--d)));
+    }
+
+    .cv {
+      width: var(--d);
+      left: calc(-0.5 * var(--d));
+      transform: rotateY(90deg) translateZ(calc(0.5 * var(--ws)));
+    }
+
+    .tape[data-turning="true"] .cv {
+      box-shadow: 0 30px 60px -28px rgba(20, 16, 10, 0.55);
+    }
+
+    /* 4. Play Ring */
+    .play-ring {
+      position: fixed;
+      width: 42px;
+      height: 42px;
+      margin-left: -21px;
+      margin-top: -21px;
+      border-radius: 50%;
+      border: 1px solid var(--cobalt);
+      color: var(--cobalt);
+      background-color: rgba(237, 235, 230, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 45;
+      transform: scale(0);
+      transform-origin: center center;
+      transition: transform 0.25s var(--ease);
+      pointer-events: auto;
+      will-change: transform;
+    }
+
+    .play-ring svg {
+      width: 12px;
+      height: 12px;
+      fill: currentColor;
+      transform: translateX(1.5px);
+    }
+
+    /* 5. Caption Stack */
+    .caption-container {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      top: calc(50% + var(--H) / 2 + 30px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 9px;
+      z-index: 35;
+      pointer-events: none;
+      text-align: center;
+      width: min(92vw, 760px);
+    }
+
+    .caption-mask {
+      position: relative;
+      overflow: hidden;
+      width: min(92vw, 760px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .caption-mask.title-mask {
+      height: 40px;
+    }
+
+    .caption-mask.subtitle-mask {
+      height: 20px;
+    }
+
+    .caption-mask.year-mask {
+      height: 18px;
+    }
+
+    .caption-text {
+      position: relative;
+      display: inline-block;
+      white-space: nowrap;
+      text-align: center;
+      will-change: transform;
+    }
+
+    .caption-text.title {
+      font-family: "Newsreader", Georgia, serif;
+      font-weight: 400;
+      font-size: 31px;
+      line-height: 1.12;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+
+    .caption-text.subtitle {
+      color: var(--cobalt);
+      font-weight: 500;
+    }
+
+    .caption-text.year {
+      font-family: "Inter Tight", sans-serif;
+      font-weight: 500;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--ink);
+    }
+
+    /* 6. Navigation Chevrons */
+    .nav-arrow {
+      position: fixed;
+      top: calc(50% + var(--H) / 2 + 40px);
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      color: var(--ink);
+      opacity: 0.8;
+      transition: opacity 0.2s var(--ease), transform 0.2s var(--ease);
+    }
+
+    .nav-arrow:hover {
+      opacity: 1;
+    }
+
+    .nav-arrow.prev {
+      left: 20px;
+    }
+
+    .nav-arrow.next {
+      right: 20px;
+    }
+
+    /* 7. Footer */
+    .footer {
+      position: fixed;
+      left: 32px;
+      right: 32px;
+      bottom: 26px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 50;
+      pointer-events: auto;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 12px;
+    }
+
+    /* 8. Custom Cursor */
+    .cursor-wrap {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 58px;
+      height: 58px;
+      margin: -29px 0 0 -29px;
+      pointer-events: none;
+      z-index: 100;
+      display: none;
+    }
+
+    @media (pointer: fine) {
+      .cursor-wrap {
+        display: block;
+      }
+    }
+
+    .cursor-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1.5px solid var(--ink);
+      background-color: transparent;
+      transform: scale(1);
+      transition: transform 0.5s var(--ease), background-color 0.4s var(--ease), border-color 0.4s var(--ease);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cursor-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--ink);
+      transform: scale(1);
+      transition: transform 0.4s var(--ease);
+    }
+
+    .cursor-label {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      font-family: "Inter Tight", sans-serif;
+      font-weight: 600;
+      font-size: 10px;
+      line-height: 1;
+      letter-spacing: 0.12em;
+      transform: scale(0);
+      transition: transform 0.45s var(--ease);
+      pointer-events: none;
+    }
+
+    /* Cursor States */
+    .cursor-wrap.spine .cursor-ring {
+      transform: scale(0.72);
+    }
+
+    .cursor-wrap.btn .cursor-ring {
+      transform: scale(0.55);
+    }
+
+    .cursor-wrap.btn .cursor-dot {
+      transform: scale(0);
+    }
+
+    .cursor-wrap.open .cursor-ring {
+      transform: scale(1.75);
+      background-color: var(--cobalt);
+      border-color: var(--cobalt);
+    }
+
+    .cursor-wrap.open .cursor-dot {
+      transform: scale(0);
+    }
+
+    .cursor-wrap.open .cursor-label {
+      transform: scale(1);
+    }
+
+    /* Opening Detail Dialog */
+    .detail-dialog {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: var(--sheet);
+      z-index: 60;
+      visibility: hidden;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 4vw;
+      padding: 110px 6vw 56px 7vw;
+      box-sizing: border-box;
+      transform-origin: center center;
+    }
+
+    .detail-close-btn {
+      position: fixed;
+      top: 31px;
+      left: 32px;
+      z-index: 70;
+    }
+
+    .detail-logo {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 84px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      color: var(--cobalt);
+      z-index: 65;
+      pointer-events: none;
+    }
+
+    .detail-left {
+      align-self: center;
+      max-width: 520px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      z-index: 62;
+    }
+
+    .detail-mask-line {
+      overflow: hidden;
+      display: block;
+      width: 100%;
+    }
+
+    .detail-line-inner {
+      display: block;
+      transform: translateY(0);
+      will-change: transform;
+    }
+
+    .detail-subtitle {
+      color: var(--cobalt);
+      font-weight: 500;
+    }
+
+    .detail-title {
+      font-family: "Newsreader", Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(44px, 5.4vw, 84px);
+      line-height: 1;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+    }
+
+    .detail-meta {
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    .detail-synopsis {
+      font-family: "Newsreader", Georgia, serif;
+      font-weight: 400;
+      font-size: 17px;
+      line-height: 1.5;
+      max-width: 42ch;
+      color: var(--ink);
+    }
+
+    .detail-credit {
+      font-family: "Newsreader", Georgia, serif;
+      font-style: italic;
+      font-size: 15px;
+      line-height: 1.4;
+      color: var(--muted);
+    }
+
+    .detail-watch-btn {
+      height: 44px;
+      padding: 0 20px;
+      border: 1px solid var(--cobalt);
+      color: var(--cobalt);
+      margin-top: 10px;
+      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
+    }
+
+    .detail-watch-btn:hover {
+      background-color: var(--cobalt);
+      color: #FFFFFF;
+    }
+
+    .detail-right {
+      align-self: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      z-index: 62;
+    }
+
+    .poster-svg {
+      height: min(100%, 78vh);
+      aspect-ratio: 474 / 900;
+      max-width: 100%;
+      filter: drop-shadow(0 20px 40px rgba(20, 16, 10, 0.25));
+    }
+
+    /* Responsive Mobile Settings (≤ 767px) */
+    @media (max-width: 767px) {
+      .top-bar {
+        height: 64px;
+        padding: 0 16px;
+      }
+
+      .logo-main {
+        font-size: 19px;
+      }
+
+      .logo-sub {
+        font-size: 7.5px;
+      }
+
+      .top-bar .lbl {
+        font-size: 9px;
+      }
+
+      .career-label {
+        display: none !important;
+      }
+
+      .decades-nav {
+        top: calc(50% - var(--H) / 2 - 70px);
+      }
+
+      .decade-btn {
+        padding: 0 7px;
+        font-size: 9px;
+      }
+
+      .caption-text.title {
+        font-size: 24px;
+      }
+
+      .nav-arrow.prev {
+        left: 6px;
+      }
+
+      .nav-arrow.next {
+        right: 6px;
+      }
+
+      .footer {
+        left: 16px;
+        right: 16px;
+        bottom: 18px;
+      }
+
+      .footer .lbl {
+        font-size: 9px;
+      }
+
+      .detail-dialog {
+        display: flex;
+        flex-direction: column;
+        padding: 84px 22px 40px;
+        gap: 24px;
+        overflow-y: scroll;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .detail-close-btn {
+        top: 21px;
+        left: 16px;
+      }
+
+      .detail-logo {
+        height: 64px;
+      }
+
+      .detail-right {
+        order: -1;
+        height: auto;
+      }
+
+      .poster-svg {
+        height: 46svh;
+      }
+
+      .detail-title {
+        font-size: 42px;
+      }
+
+      .detail-synopsis {
+        font-size: 16px;
+      }
+    }
+
+    /* Probe element to measure exact computed --H */
+    #h-probe {
+      position: absolute;
+      visibility: hidden;
+      pointer-events: none;
+      height: var(--H);
+      width: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Offscreen probe to read computed --H in px -->
+  <div id="h-probe"></div>
+
+  <!-- High Performance Pre-rendered Paper Grain Layer -->
+  <div class="paper-grain" aria-hidden="true"></div>
+
+  <!-- 1. Top Bar -->
+  <header class="top-bar">
+    <div class="top-bar-left">
+      <a href="#back" class="lbl box" aria-label="Back">BACK</a>
+    </div>
+    <div class="top-bar-center">
+      <div class="logo-main">Anwesh Patro</div>
+      <div class="logo-sub">PUBLICATIONS & ARCHIVE</div>
+    </div>
+    <div class="top-bar-right">
+      <span class="lbl career-label">PUBLICATIONS 1958–1989</span>
+    </div>
+  </header>
+
+  <!-- 2. Decade Tabs -->
+  <nav class="decades-nav" aria-label="Decades">
+    <div class="tabs-wrapper">
+      <div class="tab-indicator" id="tab-indicator"></div>
+      <button class="lbl decade-btn" data-decade="all">All</button>
+      <button class="lbl decade-btn" data-decade="1950s">1950s</button>
+      <button class="lbl decade-btn" data-decade="1960s">1960s</button>
+      <button class="lbl decade-btn" data-decade="1970s">1970s</button>
+      <button class="lbl decade-btn" data-decade="1980s">1980s</button>
+    </div>
+  </nav>
+
+  <!-- 3. 3D Shelf -->
+  <section class="shelf-container" id="shelf" aria-label="Bookshelf collection">
+    <div class="stage" id="stage">
+      <!-- 36 Tapes generated by JS -->
+    </div>
+  </section>
+
+  <!-- 4. Play Ring -->
+  <button class="play-ring" id="play-ring" aria-label="Open book" title="Open book">
+    <svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"></polygon></svg>
+  </button>
+
+  <!-- 5. Caption Stack -->
+  <div class="caption-container" aria-live="polite">
+    <div class="caption-mask title-mask" id="title-mask">
+      <span class="caption-text title" id="caption-title">Noon in Ashes</span>
+    </div>
+    <div class="caption-mask subtitle-mask" id="subtitle-mask">
+      <span class="caption-text lbl subtitle" id="caption-subtitle">FRONTIER NOVEL · 388 PAGES</span>
+    </div>
+    <div class="caption-mask year-mask" id="year-mask">
+      <span class="caption-text year" id="caption-year">1971</span>
+    </div>
+  </div>
+
+  <!-- 6. Navigation Chevrons -->
+  <button class="nav-arrow prev" id="arrow-prev" aria-label="Previous book">
+    <svg width="18" height="10" viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.2">
+      <path d="M5 1 L1 5 L5 9" />
+      <path d="M1 5 L17 5" />
+    </svg>
+  </button>
+  <button class="nav-arrow next" id="arrow-next" aria-label="Next book">
+    <svg width="18" height="10" viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.2">
+      <path d="M13 1 L17 5 L13 9" />
+      <path d="M17 5 L1 5" />
+    </svg>
+  </button>
+
+  <!-- 7. Footer -->
+  <footer class="footer">
+    <span class="lbl">© ANWESH PATRO. ALL RIGHTS RESERVED.</span>
+    <div class="footer-links">
+      <a href="#fb" class="lbl">FB</a>
+      <span class="lbl">/</span>
+      <a href="#tw" class="lbl">TW</a>
+    </div>
+  </footer>
+
+  <!-- 8. Custom Cursor -->
+  <div class="cursor-wrap" id="cursor">
+    <div class="cursor-ring">
+      <div class="cursor-dot"></div>
+      <div class="cursor-label">
+        <span>OPEN</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Paper Detail Dialog -->
+  <div class="detail-dialog" id="detail-dialog" role="dialog" aria-modal="true" aria-label="Book detail">
+    <button class="lbl box detail-close-btn" id="detail-close-btn" aria-label="Close dialog">CLOSE</button>
+    
+    <div class="detail-logo">
+      <div class="logo-main">Anwesh Patro</div>
+      <div class="logo-sub">PUBLICATIONS & ARCHIVE</div>
+    </div>
+
+    <div class="detail-left">
+      <div class="detail-mask-line">
+        <span class="detail-line-inner lbl detail-subtitle" id="detail-subtitle">FIRST EDITION / FRONTIER NOVEL</span>
+      </div>
+      <div class="detail-mask-line">
+        <h1 class="detail-line-inner detail-title" id="detail-title">Noon in Ashes</h1>
+      </div>
+      <div class="detail-mask-line">
+        <span class="detail-line-inner lbl detail-meta" id="detail-meta">1971 / FRONTIER NOVEL / 388 PAGES</span>
+      </div>
+      <div class="detail-mask-line">
+        <p class="detail-line-inner detail-synopsis" id="detail-synopsis">A lone traveler crosses a scorched salt basin to fulfill an inherited pact, discovering the architecture of the journey only when the dust clears.</p>
+      </div>
+      <div class="detail-mask-line">
+        <p class="detail-line-inner detail-credit" id="detail-credit">Written and authored by Anwesh Patro.</p>
+      </div>
+      <div class="detail-mask-line">
+        <button class="detail-line-inner lbl box detail-watch-btn">READ BOOK</button>
+      </div>
+    </div>
+
+    <div class="detail-right">
+      <svg class="poster-svg" viewBox="0 0 474 900" aria-hidden="true">
+        <defs>
+          <filter id="ink-filter" x="-50%" y="-50%" width="200%" height="200%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="3" seed="7" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="120" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+          <mask id="ink-mask" maskUnits="userSpaceOnUse" x="-200" y="-200" width="874" height="1300">
+            <g filter="url(#ink-filter)" id="ink-blobs">
+              <circle cx="150" cy="330" r="0" fill="white" />
+              <circle cx="340" cy="600" r="0" fill="white" />
+              <circle cx="250" cy="120" r="0" fill="white" />
+              <circle cx="90" cy="760" r="0" fill="white" />
+              <circle cx="400" cy="250" r="0" fill="white" />
+              <circle cx="260" cy="860" r="0" fill="white" />
+              <circle cx="230" cy="470" r="0" fill="white" />
+            </g>
+          </mask>
+          <clipPath id="poster-clip">
+            <rect x="0" y="0" width="474" height="900" />
+          </clipPath>
+        </defs>
+        <g clip-path="url(#poster-clip)" mask="url(#ink-mask)">
+          <image id="detail-poster-img" x="0" y="0" width="474" height="900" preserveAspectRatio="none" href="" />
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       BOOK DATA & ASSETS SPECIFICATION
+       ========================================================================== */
+    const FILMS = [
+      {
+        id: 'valley',
+        title: 'The Silent Valley',
+        year: 1958,
+        decade: '1950s',
+        genre: 'Literary Fiction',
+        pages: 312,
+        synopsis: 'A quiet mountain chronicle of exile, remembrance, and the forgotten oral histories preserved along the Himalayan slopes.'
+      },
+      {
+        id: 'bluehour',
+        title: 'The Blue Hour',
+        year: 1962,
+        decade: '1960s',
+        genre: 'Poetry & Prose',
+        pages: 184,
+        synopsis: 'A collection of nocturnal reflections and maritime essays written between dusk and midnight in coastal Odisha.'
+      },
+      {
+        id: 'river',
+        title: 'River of Salt',
+        year: 1964,
+        decade: '1960s',
+        genre: 'Historical Narrative',
+        pages: 420,
+        synopsis: 'An epic documenting the forgotten trade routes, monsoon migrations, and salt barge navigators across the eastern rivers.'
+      },
+      {
+        id: 'summer',
+        title: 'The Last Summer',
+        year: 1966,
+        decade: '1960s',
+        genre: 'Coming of Age',
+        pages: 276,
+        synopsis: 'Three childhood companions spend one final, luminous summer chronicling what cannot be carried forward before the valley reservoir rises.'
+      },
+      {
+        id: 'green',
+        title: 'The Green Road',
+        year: 1969,
+        decade: '1960s',
+        genre: 'Speculative Fiction',
+        pages: 344,
+        synopsis: 'A surveyor mapping unexplored forest boundaries uncovers footsteps that always appear precisely one dawn ahead of his own transit.'
+      },
+      {
+        id: 'noon',
+        title: 'Noon in Ashes',
+        year: 1971,
+        decade: '1970s',
+        genre: 'Frontier Novel',
+        pages: 388,
+        synopsis: 'A lone traveler crosses a scorched salt basin to fulfill an inherited pact, discovering the architecture of the journey only when the dust clears.'
+      },
+      {
+        id: 'observer',
+        title: 'The Observer',
+        year: 1973,
+        decade: '1970s',
+        genre: 'Psychological Mystery',
+        pages: 296,
+        synopsis: 'A midnight archivist in a colonial repository discovers that the historical ledger entries have begun documenting his own movements.'
+      },
+      {
+        id: 'birds',
+        title: 'The Fallen Birds',
+        year: 1975,
+        decade: '1970s',
+        genre: 'Philosophical Novella',
+        pages: 224,
+        synopsis: "When silence falls unexpectedly upon a border territory, a naturalist's daughter sets out along migration paths to decipher the warning."
+      },
+      {
+        id: 'storm',
+        title: 'Light in the Storm',
+        year: 1978,
+        decade: '1970s',
+        genre: 'Dramatic Fiction',
+        pages: 368,
+        synopsis: 'A lighthouse keeper and an anonymous rescued seafarer navigate three unbroken nights of tempest, memory, and unresolved debts.'
+      },
+      {
+        id: 'tide',
+        title: 'The Long Tide',
+        year: 1981,
+        decade: '1980s',
+        genre: 'Anthology',
+        pages: 198,
+        synopsis: "Seventeen evocative short stories exploring patience, coastal livelihoods, and the cyclical rhythms of the Bay of Bengal."
+      },
+      {
+        id: 'war',
+        title: 'A Quiet War',
+        year: 1985,
+        decade: '1980s',
+        genre: 'Satirical Memoir',
+        pages: 256,
+        synopsis: 'A witty philosophical chronicle of two lifelong neighbours engaged in a thirty-year dispute over an ancestral boundary wall.'
+      },
+      {
+        id: 'door',
+        title: 'Red Door',
+        year: 1989,
+        decade: '1980s',
+        genre: 'Architecture & Essays',
+        pages: 310,
+        synopsis: 'Essays on forgotten spaces, acoustic memory, and threshold design inside the labyrinthine halls of old single-screen cinema palaces.'
+      }
+    ];
+
+    const SHEET = {
+      covers: ['./assets/covers.webp', 1744, 2336],
+      spines: ['./assets/spines.webp', 2688, 1152],
+      fix: ['./assets/fix.webp', 1520, 2688],
+      fix2: ['./assets/fix2.webp', 1520, 2688]
+    };
+
+    const CROP = {
+      'spine-valley': ['spines', 266, 31, 189, 1089],
+      'cover-valley': ['covers', 497, 72, 344, 659],
+      'spine-bluehour': ['spines', 492, 31, 189, 1089],
+      'cover-bluehour': ['covers', 914, 72, 342, 659],
+      'spine-river': ['fix', 197, 54, 324, 2566],
+      'cover-river': ['covers', 1332, 72, 344, 659],
+      'spine-summer': ['spines', 937, 31, 188, 1089],
+      'cover-summer': ['covers', 74, 813, 344, 676],
+      'spine-green': ['spines', 1157, 31, 185, 1090],
+      'cover-green': ['covers', 497, 815, 344, 674],
+      'spine-noon': ['spines', 44, 32, 184, 1088],
+      'cover-noon': ['covers', 74, 72, 347, 659],
+      'spine-observer': ['fix2', 371, 15, 349, 2655],
+      'cover-observer': ['covers', 915, 815, 342, 675],
+      'spine-birds': ['spines', 1573, 31, 183, 1089],
+      'cover-birds': ['covers', 1331, 815, 345, 675],
+      'spine-storm': ['fix2', 808, 15, 347, 2656],
+      'cover-storm': ['covers', 74, 1571, 345, 681],
+      'spine-tide': ['spines', 2012, 31, 188, 1089],
+      'cover-tide': ['covers', 496, 1577, 343, 678],
+      'spine-war': ['spines', 2236, 31, 189, 1089],
+      'cover-war': ['covers', 913, 1579, 343, 676],
+      'spine-door': ['spines', 2462, 31, 188, 1089],
+      'cover-door': ['covers', 1331, 1579, 344, 677]
+    };
+
+    // Preload all 4 sheets
+    Object.values(SHEET).forEach(([url]) => {
+      const img = new Image();
+      img.src = url;
+    });
+
+    /* ==========================================================================
+       GEOMETRY, STATE & MATH ENGINE
+       ========================================================================== */
+    const stage = document.getElementById('stage');
+    const shelf = document.getElementById('shelf');
+    const hProbe = document.getElementById('h-probe');
+    const playRing = document.getElementById('play-ring');
+    const tabIndicator = document.getElementById('tab-indicator');
+    const cursor = document.getElementById('cursor');
+
+    let H = 0, ws = 0, d = 0, gap = 0;
+    let W = window.innerWidth, windowH = window.innerHeight;
+    let s = 17; // opens on Noon in Ashes (index 5 + 12 = 17)
+    let T = 17;
+    let activeIndex = 5;
+    let hoverIndex = -1;
+    let isOpen = false;
+    let onCover = false;
+
+    // Pointer & Cursor
+    let mx = W / 2, my = windowH / 2;
+    let cx = W / 2, cy = windowH / 2;
+    let tiltX = 0, tiltY = 0;
+
+    // Dragging
+    let isDragging = false;
+    let startPointerX = 0;
+    let startT = 0;
+    let didDragMove = false;
+    let wheelTimer = null;
+
+    // Reduced motion flag
+    const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Create 36 virtual tapes (3 loops of 12)
+    const tapeElements = [];
+    const tapeLifts = new Float32Array(36);
+    const lastSpineShades = new Float32Array(36).fill(-1);
+    const lastCoverShades = new Float32Array(36).fill(-1);
+    const lastTurningStates = new Uint8Array(36);
+
+    function createTapes() {
+      stage.innerHTML = '';
+      tapeElements.length = 0;
+
+      for (let v = 0; v < 36; v++) {
+        const filmIdx = v % 12;
+        const film = FILMS[filmIdx];
+
+        const tape = document.createElement('div');
+        tape.className = 'tape';
+        tape.dataset.virtualIndex = v;
+        tape.dataset.filmIndex = filmIdx;
+
+        // Spine face
+        const sp = document.createElement('div');
+        sp.className = 'face sp';
+        applyFaceCrop(sp, `spine-${film.id}`);
+
+        // Cover face
+        const cv = document.createElement('div');
+        cv.className = 'face cv';
+        applyFaceCrop(cv, `cover-${film.id}`);
+
+        tape.appendChild(sp);
+        tape.appendChild(cv);
+        stage.appendChild(tape);
+
+        tape.addEventListener('pointerenter', () => {
+          hoverIndex = v;
+        });
+        tape.addEventListener('pointerleave', () => {
+          if (hoverIndex === v) hoverIndex = -1;
+        });
+
+        tapeElements.push(tape);
+      }
+    }
+
+    function applyFaceCrop(el, cropKey) {
+      const [sheetId, x, y, w, h] = CROP[cropKey];
+      const [sheetUrl, W_sheet, H_sheet] = SHEET[sheetId];
+
+      const sizeX = (W_sheet / w) * 100;
+      const sizeY = (H_sheet / h) * 100;
+      const posX = ((x / (W_sheet - w)) * 100).toFixed(4);
+      const posY = ((y / (H_sheet - h)) * 100).toFixed(4);
+
+      el.style.backgroundImage = `url(${sheetUrl})`;
+      el.style.backgroundSize = `${sizeX}% ${sizeY}%`;
+      el.style.backgroundPosition = `${posX}% ${posY}%`;
+    }
+
+    function updateDimensions() {
+      W = window.innerWidth;
+      windowH = window.innerHeight;
+      H = hProbe.offsetHeight || 300;
+      ws = H * 142 / 840;
+      d = H * 474 / 900;
+      gap = H * 0.03;
+
+      stage.style.setProperty('--ws', `${ws}px`);
+      stage.style.setProperty('--d', `${d}px`);
+
+      updateDecadeIndicator(false);
+    }
+
+    function smoothstep(x) {
+      const c = Math.max(0, Math.min(1, x));
+      return c * c * (3 - 2 * c);
+    }
+
+    function B(r) {
+      if (Math.abs(r) < 1) {
+        return (r + Math.sin(Math.PI * r) / Math.PI) / 2;
+      }
+      return r >= 1 ? 0.5 : -0.5;
+    }
+
+    function F(r) {
+      return r * (ws + gap) + (d - ws + 1.6 * gap) * B(r);
+    }
+
+    /* ==========================================================================
+       TABS & DECADE SYNC
+       ========================================================================== */
+    const tabButtons = document.querySelectorAll('.decade-btn');
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const decade = btn.dataset.decade;
+        if (decade === 'all') {
+          jumpToFilm(0);
+        } else {
+          const targetIdx = FILMS.findIndex(f => f.decade === decade);
+          if (targetIdx !== -1) {
+            jumpToFilm(targetIdx);
+          }
+        }
+      });
+    });
+
+    function jumpToFilm(targetFilmIdx) {
+      // Find closest representation of targetFilmIdx from current s
+      const currentLoop = Math.floor(s / 12);
+      const candidates = [
+        (currentLoop - 1) * 12 + targetFilmIdx,
+        currentLoop * 12 + targetFilmIdx,
+        (currentLoop + 1) * 12 + targetFilmIdx
+      ];
+      let best = candidates[0];
+      let minDiff = Math.abs(best - s);
+      for (let i = 1; i < candidates.length; i++) {
+        const diff = Math.abs(candidates[i] - s);
+        if (diff < minDiff) {
+          minDiff = diff;
+          best = candidates[i];
+        }
+      }
+      T = best;
+    }
+
+    function updateDecadeIndicator(animate = true) {
+      const currentFilm = FILMS[activeIndex];
+      const activeBtn = document.querySelector(`.decade-btn[data-decade="${currentFilm.decade}"]`);
+
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+        if (!animate) {
+          tabIndicator.style.transition = 'none';
+        }
+        tabIndicator.style.width = `${activeBtn.offsetWidth}px`;
+        tabIndicator.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
+        if (!animate) {
+          tabIndicator.offsetHeight;
+          tabIndicator.style.transition = '';
+        }
+      }
+    }
+
+    /* ==========================================================================
+       CAPTION MASK SLIDE ANIMATIONS
+       ========================================================================== */
+    const captionTitleMask = document.getElementById('title-mask');
+    const captionSubtitleMask = document.getElementById('subtitle-mask');
+    const captionYearMask = document.getElementById('year-mask');
+
+    function animateMaskSpan(container, text, dir, extraClass = '') {
+      if (prefersReducedMotion) {
+        container.innerHTML = `<span class="caption-text ${extraClass}">${text}</span>`;
+        return;
+      }
+
+      const oldSpan = container.firstElementChild;
+      if (oldSpan) {
+        oldSpan.style.position = 'absolute';
+      }
+
+      const newSpan = document.createElement('span');
+      newSpan.className = `caption-text ${extraClass}`;
+      newSpan.textContent = text;
+      newSpan.style.position = 'relative';
+
+      container.appendChild(newSpan);
+
+      // Slide in new span
+      newSpan.animate([
+        { transform: `translateY(${dir * 105}%)` },
+        { transform: 'translateY(0%)' }
+      ], {
+        duration: 650,
+        easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+        fill: 'both'
+      });
+
+      // Slide out old span
+      if (oldSpan) {
+        const outAnim = oldSpan.animate([
+          { transform: 'translateY(0%)' },
+          { transform: `translateY(${-dir * 105}%)` }
+        ], {
+          duration: 650,
+          easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+          fill: 'both'
+        });
+        outAnim.onfinish = () => oldSpan.remove();
+      }
+    }
+
+    function setActiveFilm(newIdx, dir = 1) {
+      if (newIdx === activeIndex) return;
+      activeIndex = newIdx;
+      const film = FILMS[activeIndex];
+
+      animateMaskSpan(captionTitleMask, film.title, dir, 'title');
+      animateMaskSpan(captionSubtitleMask, `${film.genre.toUpperCase()} · ${film.pages} PAGES`, dir, 'lbl subtitle');
+      animateMaskSpan(captionYearMask, film.year, dir, 'year');
+
+      updateDecadeIndicator(true);
+    }
+
+    /* ==========================================================================
+       INPUT LISTENERS: ARROWS, DRAG, WHEEL, KEYBOARD
+       ========================================================================== */
+    document.getElementById('arrow-prev').addEventListener('click', () => {
+      T = Math.round(T) - 1;
+    });
+
+    document.getElementById('arrow-next').addEventListener('click', () => {
+      T = Math.round(T) + 1;
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (isOpen) {
+        if (e.key === 'Escape') closeDetail();
+        return;
+      }
+      if (e.key === 'ArrowLeft') {
+        T = Math.round(T) - 1;
+      } else if (e.key === 'ArrowRight') {
+        T = Math.round(T) + 1;
+      } else if (e.key === 'Enter') {
+        openDetail();
+      }
+    });
+
+    // Pointer Drag on shelf
+    shelf.addEventListener('pointerdown', (e) => {
+      if (isOpen) return;
+      isDragging = true;
+      didDragMove = false;
+      startPointerX = e.clientX;
+      startT = T;
+      shelf.setPointerCapture(e.pointerId);
+    });
+
+    shelf.addEventListener('pointermove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - startPointerX;
+      if (Math.abs(dx) > 5) {
+        didDragMove = true;
+      }
+      T = startT - dx / (ws + gap);
+    });
+
+    function endDrag(e) {
+      if (!isDragging) return;
+      isDragging = false;
+      T = Math.round(T);
+      try {
+        shelf.releasePointerCapture(e.pointerId);
+      } catch (err) {}
+    }
+
+    shelf.addEventListener('pointerup', endDrag);
+    shelf.addEventListener('pointercancel', endDrag);
+
+    // Tape click
+    stage.addEventListener('click', (e) => {
+      if (didDragMove || isOpen) return;
+      const tape = e.target.closest('.tape');
+      if (!tape) return;
+
+      const v = parseInt(tape.dataset.virtualIndex, 10);
+      let r = (v - s) % 36;
+      if (r > 18) r -= 36;
+      if (r < -18) r += 36;
+
+      if (Math.abs(r) < 0.5) {
+        openDetail();
+      } else {
+        T = Math.round(T + r);
+      }
+    });
+
+    // Wheel scrub
+    window.addEventListener('wheel', (e) => {
+      if (isOpen) return;
+      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      T += (delta / (ws + gap)) * 0.5;
+
+      clearTimeout(wheelTimer);
+      wheelTimer = setTimeout(() => {
+        T = Math.round(T);
+      }, 160);
+    }, { passive: true });
+
+    // Play Ring Action
+    playRing.addEventListener('click', () => {
+      if (!isOpen) openDetail();
+    });
+
+    /* ==========================================================================
+       CUSTOM CURSOR & POINTER TRACKING
+       ========================================================================== */
+    window.addEventListener('pointermove', (e) => {
+      mx = e.clientX;
+      my = e.clientY;
+    });
+
+    // Interactive button hover styling
+    function setupInteractiveHovers() {
+      document.querySelectorAll('button, a').forEach(el => {
+        el.addEventListener('pointerenter', () => {
+          if (!cursor.classList.contains('open')) {
+            cursor.classList.add('btn');
+          }
+        });
+        el.addEventListener('pointerleave', () => {
+          cursor.classList.remove('btn');
+        });
+      });
+    }
+
+    /* ==========================================================================
+       DETAIL DIALOG & INK BLEED ANIMATION
+       ========================================================================== */
+    const detailDialog = document.getElementById('detail-dialog');
+    const detailCloseBtn = document.getElementById('detail-close-btn');
+    const detailPosterImg = document.getElementById('detail-poster-img');
+    const inkBlobs = document.querySelectorAll('#ink-blobs circle');
+
+    const detailSubtitle = document.getElementById('detail-subtitle');
+    const detailTitle = document.getElementById('detail-title');
+    const detailMeta = document.getElementById('detail-meta');
+    const detailSynopsis = document.getElementById('detail-synopsis');
+
+    const BLOB_DELAYS = [0, 120, 220, 300, 360, 420, 180];
+    let inkBleedStartTime = 0;
+    let inkBleedRafId = null;
+
+    function openDetail() {
+      if (isOpen) return;
+      isOpen = true;
+      T = Math.round(T);
+
+      const film = FILMS[activeIndex];
+
+      // Populate Detail Text
+      detailSubtitle.textContent = `FIRST EDITION / ${film.genre.toUpperCase()}`;
+      detailTitle.textContent = film.title;
+      detailMeta.textContent = `${film.year} / ${film.genre.toUpperCase()} / ${film.pages || film.minutes} PAGES`;
+      detailSynopsis.textContent = film.synopsis;
+
+      // Populate SVG Image with exact cropped region
+      const [sheetId, cropX, cropY, cropW, cropH] = CROP[`cover-${film.id}`];
+      const [sheetUrl, W_sheet, H_sheet] = SHEET[sheetId];
+
+      const imgX = -cropX * 474 / cropW;
+      const imgY = -cropY * 900 / cropH;
+      const imgW = W_sheet * 474 / cropW;
+      const imgH = H_sheet * 900 / cropH;
+
+      detailPosterImg.setAttribute('href', sheetUrl);
+      detailPosterImg.setAttribute('x', imgX);
+      detailPosterImg.setAttribute('y', imgY);
+      detailPosterImg.setAttribute('width', imgW);
+      detailPosterImg.setAttribute('height', imgH);
+
+      // Reset ink blob radii
+      inkBlobs.forEach(blob => blob.setAttribute('r', '0'));
+
+      // Find active tape's cover element rect
+      const activeTape = tapeElements.find(t => parseInt(t.dataset.virtualIndex, 10) === Math.round(s));
+      const coverFace = activeTape ? activeTape.querySelector('.cv') : null;
+      const rect = coverFace ? coverFace.getBoundingClientRect() : {
+        top: windowH / 2 - H / 2,
+        bottom: windowH / 2 + H / 2,
+        left: W / 2 - d / 2,
+        right: W / 2 + d / 2,
+        width: d,
+        height: H
+      };
+
+      const topInset = rect.top;
+      const rightInset = W - rect.right;
+      const bottomInset = windowH - rect.bottom;
+      const leftInset = rect.left;
+
+      detailDialog.style.visibility = 'visible';
+      detailDialog.style.transformOrigin = `${rect.left + rect.width / 2}px ${rect.top + rect.height / 2}px`;
+
+      if (prefersReducedMotion) {
+        inkBlobs.forEach(blob => blob.setAttribute('r', '720'));
+        return;
+      }
+
+      // 1. Expand Sheet
+      detailDialog.animate([
+        {
+          clipPath: `inset(${topInset}px ${rightInset}px ${bottomInset}px ${leftInset}px round 3px)`,
+          transform: 'rotate(-4.5deg)'
+        },
+        {
+          clipPath: 'inset(0px 0px 0px 0px round 0px)',
+          transform: 'rotate(0deg)'
+        }
+      ], {
+        duration: 1050,
+        easing: 'cubic-bezier(0.76, 0, 0.18, 1)',
+        fill: 'both'
+      });
+
+      // 2. Text Lines Rise
+      const lineInners = detailDialog.querySelectorAll('.detail-line-inner');
+      lineInners.forEach((line, i) => {
+        line.animate([
+          { transform: 'translateY(110%)' },
+          { transform: 'translateY(0%)' }
+        ], {
+          duration: 900,
+          delay: 620 + i * 75,
+          easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+          fill: 'both'
+        });
+      });
+
+      // 3. Ink Bleed Simulation (starts 520ms after open)
+      setTimeout(() => {
+        inkBleedStartTime = performance.now();
+        runInkBleed();
+      }, 520);
+    }
+
+    function runInkBleed() {
+      const now = performance.now();
+      const elapsed = now - inkBleedStartTime;
+      let allDone = true;
+
+      inkBlobs.forEach((circle, i) => {
+        const delay = BLOB_DELAYS[i];
+        const blobElapsed = elapsed - delay;
+        if (blobElapsed <= 0) {
+          circle.setAttribute('r', '0');
+          allDone = false;
+        } else {
+          const p = Math.min(1, blobElapsed / 1250);
+          const eased = 1 - Math.pow(1 - p, 3);
+          const radius = eased * 720;
+          circle.setAttribute('r', radius.toFixed(1));
+          if (p < 1) allDone = false;
+        }
+      });
+
+      if (!allDone && elapsed < 2600) {
+        inkBleedRafId = requestAnimationFrame(runInkBleed);
+      }
+    }
+
+    function closeDetail() {
+      if (!isOpen) return;
+      if (inkBleedRafId) cancelAnimationFrame(inkBleedRafId);
+
+      const activeTape = tapeElements.find(t => parseInt(t.dataset.virtualIndex, 10) === Math.round(s));
+      const coverFace = activeTape ? activeTape.querySelector('.cv') : null;
+      const rect = coverFace ? coverFace.getBoundingClientRect() : {
+        top: windowH / 2 - H / 2,
+        bottom: windowH / 2 + H / 2,
+        left: W / 2 - d / 2,
+        right: W / 2 + d / 2,
+        width: d,
+        height: H
+      };
+
+      const topInset = rect.top;
+      const rightInset = W - rect.right;
+      const bottomInset = windowH - rect.bottom;
+      const leftInset = rect.left;
+
+      if (prefersReducedMotion) {
+        detailDialog.style.visibility = 'hidden';
+        isOpen = false;
+        return;
+      }
+
+      const closeAnim = detailDialog.animate([
+        {
+          clipPath: 'inset(0px 0px 0px 0px round 0px)',
+          transform: 'rotate(0deg)'
+        },
+        {
+          clipPath: `inset(${topInset}px ${rightInset}px ${bottomInset}px ${leftInset}px round 3px)`,
+          transform: 'rotate(-4.5deg)'
+        }
+      ], {
+        duration: 850,
+        easing: 'cubic-bezier(0.76, 0, 0.18, 1)',
+        fill: 'both'
+      });
+
+      closeAnim.onfinish = () => {
+        detailDialog.style.visibility = 'hidden';
+        detailDialog.getAnimations().forEach(a => a.cancel());
+        isOpen = false;
+      };
+    }
+
+    detailCloseBtn.addEventListener('click', closeDetail);
+
+    /* ==========================================================================
+       MAIN ANIMATION / PHYSICS LOOP
+       ========================================================================== */
+    let lastTime = performance.now();
+
+    function frame(now) {
+      requestAnimationFrame(frame);
+
+      let dt = (now - lastTime) / 1000;
+      lastTime = now;
+      if (dt > 0.05) dt = 0.05;
+
+      // 1. Spring physics for shelf scroll position s
+      const k = prefersReducedMotion ? 50 : (isDragging ? 18 : 5.2);
+      const diff = T - s;
+
+      if (Math.abs(diff) < 1e-4) {
+        s = T;
+      } else {
+        s += diff * (1 - Math.exp(-k * dt));
+      }
+
+      // Normalise s & T if drifting beyond ±4 full loops (48 tapes)
+      if (s > 36) {
+        s -= 12;
+        T -= 12;
+      } else if (s < 0) {
+        s += 12;
+        T += 12;
+      }
+
+      // Check active film change
+      const nearestFilm = ((Math.round(s) % 12) + 12) % 12;
+      if (nearestFilm !== activeIndex) {
+        const dir = Math.sign(T - s) || 1;
+        setActiveFilm(nearestFilm, dir);
+      }
+
+      // 2. Smooth cursor follow
+      cx += (mx - cx) * (1 - Math.exp(-16 * dt));
+      cy += (my - cy) * (1 - Math.exp(-16 * dt));
+      cursor.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
+
+      // 3. Cover hit-testing for tilt & cursor state
+      const shelfCenterY = windowH / 2;
+      const isSettled = Math.abs(T - s) < 0.3;
+      const dxFromCenter = Math.abs(mx - W / 2);
+      const dyFromCenter = Math.abs(my - shelfCenterY);
+
+      onCover = !isOpen && isSettled && (dxFromCenter <= 0.55 * d) && (dyFromCenter <= 0.55 * H);
+
+      let targetTiltY = 0;
+      let targetTiltX = 0;
+
+      if (onCover) {
+        targetTiltY = ((mx - W / 2) / (0.55 * d)) * 9;
+        targetTiltX = -((my - shelfCenterY) / (H / 2)) * 6;
+      } else {
+        targetTiltY = ((mx - W / 2) / W) * 5;
+        targetTiltX = 0;
+      }
+
+      tiltY += (targetTiltY - tiltY) * (1 - Math.exp(-7 * dt));
+      tiltX += (targetTiltX - tiltX) * (1 - Math.exp(-7 * dt));
+
+      // Cursor classes
+      if (isOpen) {
+        cursor.classList.remove('open', 'spine');
+      } else if (onCover) {
+        cursor.classList.add('open');
+        cursor.classList.remove('spine', 'btn');
+      } else {
+        cursor.classList.remove('open');
+        if (hoverIndex !== -1) {
+          const hoveredTape = tapeElements[hoverIndex];
+          const v = parseInt(hoveredTape.dataset.virtualIndex, 10);
+          let r = (v - s) % 36;
+          if (r > 18) r -= 36;
+          if (r < -18) r += 36;
+
+          if (Math.abs(r) > 0.5) {
+            cursor.classList.add('spine');
+          } else {
+            cursor.classList.remove('spine');
+          }
+        } else {
+          cursor.classList.remove('spine');
+        }
+      }
+
+      // 4. Update each tape's 3D transform & shading
+      const culledLimit = W / 2 + 1.5 * d;
+
+      for (let v = 0; v < 36; v++) {
+        const tape = tapeElements[v];
+
+        // Relative index r within range [-18, 18]
+        let r = (v - s) % 36;
+        if (r > 18) r -= 36;
+        if (r < -18) r += 36;
+
+        const x = F(r);
+
+        // Offscreen culling
+        if (Math.abs(x) > culledLimit) {
+          tape.style.visibility = 'hidden';
+          continue;
+        }
+        tape.style.visibility = 'visible';
+
+        // Hover lift
+        const isHovered = (hoverIndex === v && Math.abs(r) > 0.5 && !isOpen);
+        const liftTarget = isHovered ? 1 : 0;
+        if (liftTarget !== 0 || tapeLifts[v] > 1e-4) {
+          tapeLifts[v] += (liftTarget - tapeLifts[v]) * (1 - Math.exp(-12 * dt));
+          if (liftTarget === 0 && tapeLifts[v] < 1e-4) tapeLifts[v] = 0;
+        }
+        const lift = tapeLifts[v];
+
+        // Openness o
+        const absR = Math.abs(r);
+        const o = absR >= 1 ? 0 : smoothstep(1 - absR);
+
+        // Active / Turning state for box-shadow
+        const isTurning = o > 0.02;
+        if (isTurning !== (lastTurningStates[v] === 1)) {
+          lastTurningStates[v] = isTurning ? 1 : 0;
+          tape.dataset.turning = isTurning ? 'true' : 'false';
+        }
+
+        // Geometry transforms
+        const rotY = -90 * o + tiltY * o;
+        const rotX = tiltX * o;
+        const rotZ = -4.5 * o;
+        const transZ = o * 0.2 * H;
+        const transY = -o * 0.025 * H - lift * 0.045 * H;
+
+        tape.style.transform = `translate3d(${x.toFixed(2)}px, ${transY.toFixed(2)}px, ${transZ.toFixed(2)}px) rotateZ(${rotZ.toFixed(2)}deg) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg)`;
+        tape.style.zIndex = Math.round(100 - absR * 4);
+
+        // Face Shading (only update DOM style when changed)
+        const spineShade = o * 0.55;
+        const coverShade = (1 - o) * 0.5;
+
+        if (Math.abs(spineShade - lastSpineShades[v]) > 0.008) {
+          spFace.style.setProperty('--shade', spineShade.toFixed(3));
+          lastSpineShades[v] = spineShade;
+        }
+        if (Math.abs(coverShade - lastCoverShades[v]) > 0.008) {
+          cvFace.style.setProperty('--shade', coverShade.toFixed(3));
+          lastCoverShades[v] = coverShade;
+        }
+      }
+
+      // 5. Play Ring scale and position
+      const playRingScale = isOpen ? 0 : smoothstep(Math.max(0, 1 - Math.abs(T - s) * 3));
+      const playRingLeft = W / 2 - 0.5 * d - 6;
+      const playRingTop = shelfCenterY + 0.36 * H;
+
+      playRing.style.left = `${playRingLeft}px`;
+      playRing.style.top = `${playRingTop}px`;
+      playRing.style.transform = `scale(${playRingScale})`;
+    }
+
+    /* ==========================================================================
+       INITIALIZATION
+       ========================================================================== */
+    window.addEventListener('resize', updateDimensions);
+
+    // Initial setup
+    createTapes();
+    updateDimensions();
+    setupInteractiveHovers();
+    updateDecadeIndicator(false);
+
+    if (document.fonts) {
+      document.fonts.ready.then(() => {
+        updateDimensions();
+        updateDecadeIndicator(false);
+      });
+    }
+
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>
