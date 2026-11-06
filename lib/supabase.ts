@@ -6,8 +6,11 @@ export interface SupabaseConfig {
 }
 
 export function getSupabaseConfig(): SupabaseConfig {
-  const url = localStorage.getItem('SUPABASE_URL') || (import.meta.env.VITE_SUPABASE_URL as string) || ''
-  const anonKey = localStorage.getItem('SUPABASE_ANON_KEY') || (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || ''
+  let url = localStorage.getItem('SUPABASE_URL') || (import.meta.env.VITE_SUPABASE_URL as string) || ''
+  if (url) {
+    url = url.trim().replace(/\/rest\/v1\/?$/, '').replace(/\/+$/, '')
+  }
+  const anonKey = (localStorage.getItem('SUPABASE_ANON_KEY') || (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || '').trim()
   return { url, anonKey }
 }
 

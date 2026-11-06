@@ -848,9 +848,9 @@ export function Demo() {
   const [showGroqModal, setShowGroqModal] = useState(false);
   const [tempGroqKey, setTempGroqKey] = useState(groqKey);
 
-  // Supabase State
-  const [supabaseUrl, setSupabaseUrl] = useState(() => localStorage.getItem("SUPABASE_URL") || "");
-  const [supabaseKey, setSupabaseKey] = useState(() => localStorage.getItem("SUPABASE_ANON_KEY") || "");
+  // Supabase State (Web-first priority with .env fallback)
+  const [supabaseUrl, setSupabaseUrl] = useState(() => (localStorage.getItem("SUPABASE_URL") || (import.meta.env.VITE_SUPABASE_URL as string) || "").replace(/\/rest\/v1\/?$/, "").replace(/\/+$/, ""));
+  const [supabaseKey, setSupabaseKey] = useState(() => (localStorage.getItem("SUPABASE_ANON_KEY") || (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || "").trim());
   const [showDbModal, setShowDbModal] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -931,8 +931,12 @@ export function Demo() {
   };
 
   const saveSupabaseConfig = () => {
-    localStorage.setItem("SUPABASE_URL", supabaseUrl);
-    localStorage.setItem("SUPABASE_ANON_KEY", supabaseKey);
+    const cleanUrl = supabaseUrl.trim().replace(/\/rest\/v1\/?$/, "").replace(/\/+$/, "");
+    const cleanKey = supabaseKey.trim();
+    localStorage.setItem("SUPABASE_URL", cleanUrl);
+    localStorage.setItem("SUPABASE_ANON_KEY", cleanKey);
+    setSupabaseUrl(cleanUrl);
+    setSupabaseKey(cleanKey);
     setShowDbModal(false);
   };
 
