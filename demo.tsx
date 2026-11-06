@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
 import * as pdfjsLib from "pdfjs-dist";
 import pdfWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
 import {
@@ -99,36 +100,93 @@ function openDB(): Promise<IDBDatabase> {
 }
 
 async function dbGetAllSessions(): Promise<ChatSession[]> {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction("sessions", "readonly");
-    const store = tx.objectStore("sessions");
-    const req = store.getAll();
-    req.onsuccess = () => resolve(req.result || []);
-    req.onerror = () => reject(req.error);
-  });
+  // 1. Try fetching shared sessions from central Supabase storage
+  try {
+    const { data, error } = await supabase
+      .from("sessions")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (!error && Array.isArray(data) && data.length > 0) {
+      return data.map((row: any) => ({
+        id: row.id,
+        title: row.title,
+        createdAt: Number(row.created_at) || Date.now(),
+        messages: Array.isArray(row.messages) ? row.messages : [],
+        documentName: row.document_name,
+        documentTree: row.document_tree,
+        rawContent: row.raw_content
+      }));
+    }
+  } catch (err) {
+    console.warn("Supabase load notice:", err);
+  }
+
+  // 2. Fallback to local IndexedDB
+  try {
+    const db = await openDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction("sessions", "readonly");
+      const store = tx.objectStore("sessions");
+      const req = store.getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => resolve([]);
+    });
+  } catch (err) {
+    return [];
+  }
 }
 
 async function dbSaveSession(session: ChatSession): Promise<void> {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction("sessions", "readwrite");
-    const store = tx.objectStore("sessions");
-    store.put(session);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
+  // 1. Save to local IndexedDB for immediate responsiveness
+  try {
+    const db = await openDB();
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction("sessions", "readwrite");
+      const store = tx.objectStore("sessions");
+      store.put(session);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (err) {
+    console.warn("IndexedDB save notice:", err);
+  }
+
+  // 2. Sync to central shared Supabase storage
+  try {
+    await supabase.from("sessions").upsert({
+      id: session.id,
+      title: session.title,
+      created_at: session.createdAt,
+      messages: session.messages,
+      document_name: session.documentName || null,
+      document_tree: session.documentTree || null,
+      raw_content: session.rawContent || null
+    });
+  } catch (err) {
+    console.warn("Supabase upsert notice:", err);
+  }
 }
 
 async function dbDeleteSession(sessionId: string): Promise<void> {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction("sessions", "readwrite");
-    const store = tx.objectStore("sessions");
-    store.delete(sessionId);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
+  try {
+    const db = await openDB();
+    await new Promise<void>((resolve) => {
+      const tx = db.transaction("sessions", "readwrite");
+      const store = tx.objectStore("sessions");
+      store.delete(sessionId);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+    });
+  } catch (err) {
+    console.warn("IndexedDB delete notice:", err);
+  }
+
+  try {
+    await supabase.from("sessions").delete().eq("id", sessionId);
+  } catch (err) {
+    console.warn("Supabase delete notice:", err);
+  }
 }
 
 // Clean and sanitize string - removes binary headers, replacement characters, and control codes
@@ -848,11 +906,6 @@ export function Demo() {
   const [showGroqModal, setShowGroqModal] = useState(false);
   const [tempGroqKey, setTempGroqKey] = useState(groqKey);
 
-  // Supabase State (Web-first priority with .env fallback)
-  const [supabaseUrl, setSupabaseUrl] = useState(() => (localStorage.getItem("SUPABASE_URL") || (import.meta.env.VITE_SUPABASE_URL as string) || "").replace(/\/rest\/v1\/?$/, "").replace(/\/+$/, ""));
-  const [supabaseKey, setSupabaseKey] = useState(() => (localStorage.getItem("SUPABASE_ANON_KEY") || (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || "").trim());
-  const [showDbModal, setShowDbModal] = useState(false);
-
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chatScrollRef = useRef<HTMLDivElement>(null);
 
@@ -928,16 +981,6 @@ export function Demo() {
     } catch (e: any) {
       setGroqTestStatus({ loading: false, success: false, msg: e.message || "Failed to connect to Groq." });
     }
-  };
-
-  const saveSupabaseConfig = () => {
-    const cleanUrl = supabaseUrl.trim().replace(/\/rest\/v1\/?$/, "").replace(/\/+$/, "");
-    const cleanKey = supabaseKey.trim();
-    localStorage.setItem("SUPABASE_URL", cleanUrl);
-    localStorage.setItem("SUPABASE_ANON_KEY", cleanKey);
-    setSupabaseUrl(cleanUrl);
-    setSupabaseKey(cleanKey);
-    setShowDbModal(false);
   };
 
   const handleSelectSession = (sessionId: string) => {
@@ -1314,8 +1357,6 @@ export function Demo() {
     );
   };
 
-  const isSupabaseConfigured = Boolean(supabaseUrl && supabaseKey);
-
   return (
     <div className="flex w-full h-screen overflow-hidden bg-black text-white antialiased">
       {/* Hidden File Input */}
@@ -1435,18 +1476,16 @@ export function Demo() {
             </span>
           </button>
 
-          <button
-            onClick={() => setShowDbModal(true)}
-            className="w-full flex items-center justify-between p-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-xs font-mono text-neutral-300 transition-colors"
-          >
+          <div className="w-full flex items-center justify-between p-2 rounded-lg bg-neutral-900/60 border border-neutral-800/80 text-xs font-mono text-neutral-300">
             <div className="flex items-center gap-1.5">
-              <Database className="w-3 h-3 text-neutral-400" />
-              <span>Database</span>
+              <Database className="w-3.5 h-3.5 text-neutral-400" />
+              <span>Cloud Storage</span>
             </div>
-            <span className="text-white text-[10px] font-mono">
-              {isSupabaseConfigured ? "Supabase Connected" : "Not Connected"}
+            <span className="text-neutral-300 text-[10px] font-mono flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-neutral-300 animate-pulse" />
+              Supabase Connected
             </span>
-          </button>
+          </div>
         </div>
       </aside>
 
@@ -1844,64 +1883,6 @@ export function Demo() {
         </div>
       )}
 
-      {/* --- Supabase Connection Modal --- */}
-      {showDbModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md bg-neutral-950 border border-neutral-800 rounded-xl p-5 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
-              <div className="flex items-center gap-2">
-                <Database className="w-4 h-4 text-white" />
-                <h3 className="text-sm font-semibold text-white">Connect Supabase</h3>
-              </div>
-              <button
-                onClick={() => setShowDbModal(false)}
-                className="p-1 text-neutral-400 hover:text-white rounded"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div>
-                <label className="text-neutral-400 block mb-1">Project URL</label>
-                <input
-                  type="text"
-                  value={supabaseUrl}
-                  onChange={e => setSupabaseUrl(e.target.value)}
-                  placeholder="Paste your Supabase URL"
-                  className="w-full px-3 py-2 bg-neutral-900 border border-neutral-800 rounded-lg text-white font-mono focus:outline-none placeholder:text-neutral-600"
-                />
-              </div>
-
-              <div>
-                <label className="text-neutral-400 block mb-1">Public Anon Key</label>
-                <input
-                  type="password"
-                  value={supabaseKey}
-                  onChange={e => setSupabaseKey(e.target.value)}
-                  placeholder="Paste your public anon key"
-                  className="w-full px-3 py-2 bg-neutral-900 border border-neutral-800 rounded-lg text-white font-mono focus:outline-none placeholder:text-neutral-600"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-2 pt-2">
-              <button
-                onClick={() => setShowDbModal(false)}
-                className="px-3 py-1.5 rounded-lg text-xs text-neutral-400 hover:text-white"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={saveSupabaseConfig}
-                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-black hover:bg-neutral-200 transition-colors"
-              >
-                Save Connection
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
